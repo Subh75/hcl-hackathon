@@ -7,7 +7,7 @@ import { PayeeDto } from '../models/payee.model';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <article class="payee-card panel">
+    <article class="payee-card panel" (click)="edit.emit()">
       <div class="avatar">{{ initials() }}</div>
       <div class="meta">
         <div class="name-row">
@@ -17,7 +17,7 @@ import { PayeeDto } from '../models/payee.model';
         <p>IBAN: {{ payee.iban }}</p>
         <p>Bank: {{ payee.bank }}</p>
       </div>
-      <button class="btn btn-secondary edit-btn" (click)="edit.emit()">Edit</button>
+      <button class="btn btn-secondary edit-btn" (click)="$event.stopPropagation(); edit.emit()">Edit</button>
     </article>
   `,
   styles: [`
@@ -28,6 +28,12 @@ import { PayeeDto } from '../models/payee.model';
       padding: 0.9rem;
       align-items: center;
       border-radius: 14px;
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    .payee-card:active {
+      transform: scale(0.98);
     }
 
     .avatar {

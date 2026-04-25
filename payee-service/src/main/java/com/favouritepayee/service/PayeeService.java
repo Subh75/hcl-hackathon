@@ -75,17 +75,16 @@ public class PayeeService {
 
         Set<Long> smartIds = smartFavourites.stream().map(PayeeDto::id).collect(Collectors.toSet());
 
-        List<PayeeDto> remaining = matchedPayees.stream()
-                .filter(payee -> !smartIds.contains(payee.getId()))
+        List<PayeeDto> allPayees = matchedPayees.stream()
                 .map(payee -> toDto(payee, scoreByPayee.getOrDefault(payee.getId(), 0.0)))
                 .toList();
 
-        int totalElements = remaining.size();
+        int totalElements = allPayees.size();
         int totalPages = totalElements == 0 ? 0 : (int) Math.ceil((double) totalElements / safeSize);
         int fromIndex = Math.min(safePage * safeSize, totalElements);
         int toIndex = Math.min(fromIndex + safeSize, totalElements);
 
-        List<PayeeDto> pageContent = remaining.subList(fromIndex, toIndex);
+        List<PayeeDto> pageContent = allPayees.subList(fromIndex, toIndex);
 
         return new PayeeListResponse(
                 smartFavourites,
