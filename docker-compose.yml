@@ -5,7 +5,7 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - JWT_SECRET=favouritePayeeSecretKey2024
+      - JWT_SECRET=favouritePayeeSecretKey2024LongKey
 
   bank-scoring-service:
     build: ./bank-scoring-service
@@ -22,7 +22,8 @@ services:
       - auth-service
       - bank-scoring-service
     environment:
-      - JWT_SECRET=favouritePayeeSecretKey2024
+      - JWT_SECRET=favouritePayeeSecretKey2024LongKey
+      - AUTH_SERVICE_URL=http://auth-service:8081
       - BANK_SERVICE_URL=http://bank-scoring-service:8083
       - SCORING_SERVICE_URL=http://bank-scoring-service:8083
 

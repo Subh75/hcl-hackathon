@@ -40,6 +40,9 @@ public class PayeeService {
     private final PayeeInteractionRepository payeeInteractionRepository;
     private final RestTemplate restTemplate;
 
+    @Value("${auth.service.url}")
+    private String authServiceUrl;
+
     @Value("${bank.service.url}")
     private String bankServiceUrl;
 
@@ -57,6 +60,7 @@ public class PayeeService {
     }
 
     public PayeeListResponse getPayees(Long customerId, int page, int size, String search) {
+        ensureCustomerExists(customerId);
         int safePage = Math.max(page, 0);
         int safeSize = size > 0 ? size : 5;
         String term = Optional.ofNullable(search).map(String::trim).orElse("");
@@ -94,6 +98,7 @@ public class PayeeService {
     }
 
     public PayeeDto getPayeeById(Long customerId, Long payeeId) {
+        ensureCustomerExists(customerId);
         FavouriteAccount payee = findPayeeOrThrow(customerId, payeeId);
         double score = fetchScores(customerId).getOrDefault(payeeId, 0.0);
         return toDto(payee, score);
@@ -101,6 +106,7 @@ public class PayeeService {
 
     @Transactional
     public PayeeDto createPayee(Long customerId, PayeeRequest request) {
+        ensureCustomerExists(customerId);
         validateCustomerPayeeLimit(customerId);
 
         String normalizedIban = normalizeIban(request.iban());
@@ -122,6 +128,7 @@ public class PayeeService {
 
     @Transactional
     public PayeeDto updatePayee(Long customerId, Long payeeId, PayeeRequest request) {
+        ensureCustomerExists(customerId);
         FavouriteAccount existing = findPayeeOrThrow(customerId, payeeId);
 
         String normalizedIban = normalizeIban(request.iban());
@@ -142,6 +149,7 @@ public class PayeeService {
 
     @Transactional
     public void deletePayee(Long customerId, Long payeeId) {
+        ensureCustomerExists(customerId);
         FavouriteAccount payee = findPayeeOrThrow(customerId, payeeId);
         payeeInteractionRepository.deleteByCustomerIdAndPayeeId(customerId, payeeId);
         favouriteAccountRepository.delete(payee);
@@ -149,6 +157,7 @@ public class PayeeService {
 
     @Transactional
     public void logInteraction(Long customerId, Long payeeId) {
+        ensureCustomerExists(customerId);
         findPayeeOrThrow(customerId, payeeId);
         PayeeInteraction interaction = new PayeeInteraction();
         interaction.setCustomerId(customerId);
@@ -158,6 +167,7 @@ public class PayeeService {
     }
 
     public List<RawPayeeDataDto> getRawPayees(Long customerId) {
+        ensureCustomerExists(customerId);
         List<FavouriteAccount> payees = favouriteAccountRepository.searchByCustomer(customerId, "");
         Map<Long, List<PayeeInteraction>> interactionsByPayee = loadInteractions(customerId, payees);
 
@@ -184,6 +194,21 @@ public class PayeeService {
     private void validateCustomerPayeeLimit(Long customerId) {
         if (favouriteAccountRepository.countByCustomerId(customerId) >= MAX_FAVOURITES) {
             throw new ConflictException("Maximum of 20 favourite accounts reached");
+        }
+    }
+
+    private void ensureCustomerExists(Long customerId) {
+        try {
+            ResponseEntity<Void> response = restTemplate.getForEntity(
+                    authServiceUrl + "/auth/customers/{id}",
+                    Void.class,
+                    customerId
+            );
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                throw new ResourceNotFoundException("Customer not found");
+            }
+        } catch (HttpClientErrorException.NotFound exception) {
+            throw new ResourceNotFoundException("Customer not found");
         }
     }
 
