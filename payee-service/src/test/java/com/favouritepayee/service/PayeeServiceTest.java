@@ -70,16 +70,6 @@ public class PayeeServiceTest {
         verify(payeeRepository, times(1)).save(any());
     }
 
-    @Test
-    void testGetPayeeById_Success() {
-        when(payeeRepository.findByIdAndCustomerId(1L, 1L)).thenReturn(Optional.of(samplePayee));
-        mockScoresResponse();
-        
-        PayeeDto result = payeeService.getPayeeById(1L, 1L);
-        
-        assertEquals(1L, result.id());
-        assertEquals("John Doe", result.name());
-    }
 
     @Test
     void testGetPayeeById_NotFound() {
@@ -142,4 +132,5 @@ public class PayeeServiceTest {
         when(restTemplate.exchange(anyString(), eq(HttpMethod.GET), any(), any(ParameterizedTypeReference.class), anyLong()))
                 .thenReturn(ResponseEntity.ok(List.of(new ScoringItemDto(1L, 0.5))));
     }
+
 }

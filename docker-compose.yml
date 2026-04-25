@@ -13,6 +13,9 @@ services:
     build: ./payee-service
     ports:
       - "8082:8082"
+    depends_on:
+      - auth-service
+      - bank-scoring-service
     environment:
       - JWT_SECRET=favouritePayeeSecretKey2024HighlySecureAndLongEnough
       - BANK_SERVICE_URL=http://bank-scoring-service:8083
