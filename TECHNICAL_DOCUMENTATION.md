@@ -1,6 +1,7 @@
 # Favourite Payee - Technical Documentation
 
-This document provides a technical overview of the "Favourite Payee" microservice application, including its architecture, data flows, API definitions, and frontend routing.
+## Project Summary
+The **Favourite Payee** application is a microservice-based banking platform that simplifies payee management through intelligent automation. Its standout feature is the **Smart Favourites** system, which uses behavioral analytics to predict and surface the most relevant accounts based on a user's historical interaction patterns and specific time-of-day habits.
 
 ---
 
