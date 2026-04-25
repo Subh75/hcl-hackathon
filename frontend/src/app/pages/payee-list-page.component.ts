@@ -39,6 +39,7 @@ import { PayeeService } from '../services/payee.service';
               *ngFor="let payee of data?.smartFavourites"
               [payee]="payee"
               [smart]="true"
+              (select)="onSelect(payee.id)"
               (edit)="onEdit(payee.id)"
             ></app-payee-card>
           </div>
@@ -51,6 +52,7 @@ import { PayeeService } from '../services/payee.service';
             <app-payee-card
               *ngFor="let payee of data?.all?.content || []"
               [payee]="payee"
+              (select)="onSelect(payee.id)"
               (edit)="onEdit(payee.id)"
             ></app-payee-card>
           </div>
@@ -161,15 +163,19 @@ export class PayeeListPageComponent implements OnInit {
     this.loadPayees();
   }
 
-  onEdit(payeeId: number): void {
+  onSelect(payeeId: number): void {
     this.payeeService.logInteraction(payeeId).subscribe({
       next: () => {
-        void this.router.navigate(['/payees/edit', payeeId]);
+        void this.router.navigate(['/payees/view', payeeId]);
       },
       error: () => {
-        void this.router.navigate(['/payees/edit', payeeId]);
+        void this.router.navigate(['/payees/view', payeeId]);
       }
     });
+  }
+
+  onEdit(payeeId: number): void {
+    void this.router.navigate(['/payees/edit', payeeId]);
   }
 
   logout(): void {

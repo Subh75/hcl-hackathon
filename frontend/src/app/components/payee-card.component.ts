@@ -7,7 +7,7 @@ import { PayeeDto } from '../models/payee.model';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <article class="payee-card panel" (click)="edit.emit()">
+    <article class="payee-card panel" (click)="select.emit()">
       <div class="avatar">{{ initials() }}</div>
       <div class="meta">
         <div class="name-row">
@@ -89,6 +89,7 @@ import { PayeeDto } from '../models/payee.model';
 export class PayeeCardComponent {
   @Input({ required: true }) payee!: PayeeDto;
   @Input() smart = false;
+  @Output() select = new EventEmitter<void>();
   @Output() edit = new EventEmitter<void>();
 
   initials(): string {

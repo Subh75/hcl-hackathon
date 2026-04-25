@@ -14,7 +14,9 @@ import { PayeeService } from '../services/payee.service';
   template: `
     <div class="page-shell">
       <section class="panel form-panel">
-        <h1 class="title">{{ editing ? 'Edit payee account' : 'Add payee account' }}</h1>
+        <h1 class="title">
+          {{ viewing ? 'Payee account details' : (editing ? 'Edit payee account' : 'Add payee account') }}
+        </h1>
         <p class="subtitle">Bank is auto-resolved from IBAN digits 4-7.</p>
 
         <form [formGroup]="form" (ngSubmit)="save()" novalidate>
@@ -47,7 +49,7 @@ import { PayeeService } from '../services/payee.service';
           <div class="error-text" *ngIf="fieldErrors['iban']">{{ fieldErrors['iban'] }}</div>
           <div class="error-text" *ngIf="errorMessage">{{ errorMessage }}</div>
 
-          <div class="actions">
+          <div class="actions" *ngIf="!viewing">
             <button class="btn btn-primary" type="submit" [disabled]="saving">{{ saving ? 'Saving...' : 'Save' }}</button>
             <button class="btn btn-secondary" type="button" (click)="cancel()">Cancel</button>
             <button
@@ -59,6 +61,10 @@ import { PayeeService } from '../services/payee.service';
             >
               Delete
             </button>
+          </div>
+
+          <div class="actions" *ngIf="viewing">
+            <button class="btn btn-secondary" type="button" (click)="cancel()">Back to list</button>
           </div>
         </form>
       </section>
@@ -125,6 +131,7 @@ export class PayeeFormPageComponent implements OnInit {
   });
 
   editing = false;
+  viewing = false;
   payeeId: number | null = null;
   saving = false;
   errorMessage = '';
@@ -160,10 +167,16 @@ export class PayeeFormPageComponent implements OnInit {
 
   ngOnInit(): void {
     const routeId = this.route.snapshot.paramMap.get('id');
+    this.viewing = this.router.url.includes('/view/');
+
     if (routeId) {
-      this.editing = true;
+      this.editing = !this.viewing;
       this.payeeId = Number(routeId);
       this.loadPayee(this.payeeId);
+    }
+
+    if (this.viewing) {
+      this.form.disable();
     }
 
     this.ibanControl.valueChanges

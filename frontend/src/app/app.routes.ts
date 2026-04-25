@@ -25,6 +25,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'payees/view/:id',
+    component: PayeeFormPageComponent,
+    canActivate: [authGuard]
+  },
+  {
     path: '',
     pathMatch: 'full',
     redirectTo: 'login'
