@@ -47,9 +47,7 @@ class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
-        customer = new Customer("testuser", "encodedPassword", Role.USER);
-        customer.setId(1L);
-
+        customer = new Customer(1L, "testuser", "encodedPassword", Role.USER);
         refreshToken = new RefreshToken("token-uuid", 1L, Instant.now().plusSeconds(3600));
     }
 
@@ -85,14 +83,14 @@ class AuthServiceTest {
 
     @Test
     void register_Success() {
+        when(customerRepository.existsById(2L)).thenReturn(false);
         when(customerRepository.existsByName("newuser")).thenReturn(false);
         when(passwordEncoder.encode("password")).thenReturn("encodedPassword");
         
-        Customer savedCustomer = new Customer("newuser", "encodedPassword", Role.USER);
-        savedCustomer.setId(2L);
+        Customer savedCustomer = new Customer(2L, "newuser", "encodedPassword", Role.USER);
         when(customerRepository.save(any(Customer.class))).thenReturn(savedCustomer);
 
-        RegisterResponse response = authService.register("newuser", "password");
+        RegisterResponse response = authService.register(2L, "newuser", "password");
 
         assertNotNull(response);
         assertEquals(2L, response.customerId());
@@ -102,9 +100,10 @@ class AuthServiceTest {
 
     @Test
     void register_UsernameAlreadyExists_ThrowsException() {
+        when(customerRepository.existsById(2L)).thenReturn(false);
         when(customerRepository.existsByName("existinguser")).thenReturn(true);
 
-        assertThrows(BadRequestException.class, () -> authService.register("existinguser", "password"));
+        assertThrows(BadRequestException.class, () -> authService.register(2L, "existinguser", "password"));
     }
 
     @Test

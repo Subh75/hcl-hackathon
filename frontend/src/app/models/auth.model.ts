@@ -19,6 +19,7 @@ export interface RefreshResponse {
 }
 
 export interface RegisterRequest {
+  customerId: number;
   name: string;
   password: string;
 }

@@ -70,7 +70,13 @@ public class AuthService {
         refreshTokenService.deleteByToken(refreshTokenStr);
     }
 
-    public RegisterResponse register(String name, String password) {
+    public RegisterResponse register(Long customerId, String name, String password) {
+        if (customerRepository.existsById(customerId)) {
+            throw new BadRequestException(
+                    "Registration failed",
+                    Map.of("customerId", "customer ID already exists"));
+        }
+
         if (customerRepository.existsByName(name)) {
             throw new BadRequestException(
                     "Registration failed",
@@ -78,6 +84,7 @@ public class AuthService {
         }
 
         Customer customer = new Customer(
+                customerId,
                 name,
                 passwordEncoder.encode(password),
                 Role.USER

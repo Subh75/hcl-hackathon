@@ -38,8 +38,8 @@ export class AuthService {
     );
   }
 
-  register(name: string, password: string): Observable<RegisterResponse> {
-    const body: RegisterRequest = { name, password };
+  register(customerId: number, name: string, password: string): Observable<RegisterResponse> {
+    const body: RegisterRequest = { customerId, name, password };
     return this.http.post<RegisterResponse>(`${environment.apiUrl}/auth/register`, body);
   }
 

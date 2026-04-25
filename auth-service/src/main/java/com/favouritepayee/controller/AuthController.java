@@ -28,7 +28,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(authService.register(request.name(), request.password()));
+                .body(authService.register(request.customerId(), request.name(), request.password()));
     }
 
     @PostMapping("/refresh")

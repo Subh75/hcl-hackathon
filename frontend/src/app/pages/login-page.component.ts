@@ -32,7 +32,6 @@ import { AuthService } from '../services/auth.service';
           class="input"
           type="password"
           [formControl]="passwordControl"
-          placeholder="Enter password"
           (keydown.enter)="login()"
         />
         <div class="error-text" *ngIf="passwordControl.invalid && passwordControl.touched">

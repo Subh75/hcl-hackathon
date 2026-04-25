@@ -49,10 +49,10 @@ class AuthControllerTest {
 
     @Test
     void register_ValidRequest_ReturnsCreated() throws Exception {
-        RegisterRequest request = new RegisterRequest("newuser", "password");
+        RegisterRequest request = new RegisterRequest(2L, "newuser", "password");
         RegisterResponse response = new RegisterResponse(2L, "newuser", "USER");
 
-        when(authService.register(anyString(), anyString())).thenReturn(response);
+        when(authService.register(anyLong(), anyString(), anyString())).thenReturn(response);
 
         mockMvc.perform(post("/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)

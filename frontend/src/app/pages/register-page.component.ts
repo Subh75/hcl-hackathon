@@ -14,6 +14,18 @@ import { AuthService } from '../services/auth.service';
         <h1 class="title">Create Account</h1>
         <p class="subtitle">Register to start managing your favourite payees.</p>
 
+        <label for="customerId" class="field-label">Customer ID</label>
+        <input
+          id="customerId"
+          class="input"
+          type="number"
+          [formControl]="customerIdControl"
+          placeholder="Choose a numeric ID"
+        />
+        <div class="error-text" *ngIf="customerIdControl.invalid && customerIdControl.touched">
+          Valid numeric Customer ID is required.
+        </div>
+
         <label for="name" class="field-label">Username</label>
         <input
           id="name"
@@ -129,6 +141,7 @@ import { AuthService } from '../services/auth.service';
   `]
 })
 export class RegisterPageComponent {
+  readonly customerIdControl = new FormControl<number | null>(null, [Validators.required, Validators.min(1)]);
   readonly nameControl = new FormControl<string>('', [Validators.required]);
   readonly passwordControl = new FormControl<string>('', [Validators.required, Validators.minLength(6)]);
   readonly confirmPasswordControl = new FormControl<string>('', [Validators.required]);
@@ -151,6 +164,10 @@ export class RegisterPageComponent {
     this.errorMessage = '';
     this.successMessage = '';
 
+    if (this.customerIdControl.invalid || this.customerIdControl.value === null) {
+      this.customerIdControl.markAsTouched();
+      return;
+    }
     if (this.nameControl.invalid) {
       this.nameControl.markAsTouched();
       return;
@@ -165,7 +182,7 @@ export class RegisterPageComponent {
     }
 
     this.loading = true;
-    this.authService.register(this.nameControl.value!, this.passwordControl.value!).subscribe({
+    this.authService.register(this.customerIdControl.value, this.nameControl.value!, this.passwordControl.value!).subscribe({
       next: (response) => {
         this.loading = false;
         this.successMessage = `Account created! Your Customer ID is ${response.customerId}. Redirecting to login...`;
@@ -175,7 +192,7 @@ export class RegisterPageComponent {
       },
       error: (error: { error?: { message?: string; errors?: Record<string, string> } }) => {
         this.loading = false;
-        this.errorMessage = error.error?.errors?.['name'] || error.error?.errors?.['password'] || error.error?.message || 'Registration failed';
+        this.errorMessage = error.error?.errors?.['customerId'] || error.error?.errors?.['name'] || error.error?.errors?.['password'] || error.error?.message || 'Registration failed';
       }
     });
   }
