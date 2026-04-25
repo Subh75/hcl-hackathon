@@ -1,0 +1,1 @@
+-- no seed data for payee service

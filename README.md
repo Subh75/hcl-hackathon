@@ -1,10 +1,31 @@
 # Favourite Payee
 
-Full stack app - Java Spring Boot + Angular
+Microservices architecture for the Favourite Payee banking application.
 
-## Setup
-### Backend
-cd backend
+## Services
+
+- auth-service (port 8081)
+- payee-service (port 8082)
+- bank-scoring-service (port 8083)
+- api-gateway (port 8080)
+- frontend (port 4200)
+
+## Run Locally
+
+### Auth Service
+cd auth-service
+mvn spring-boot:run
+
+### Payee Service
+cd payee-service
+mvn spring-boot:run
+
+### Bank Scoring Service
+cd bank-scoring-service
+mvn spring-boot:run
+
+### API Gateway
+cd api-gateway
 mvn spring-boot:run
 
 ### Frontend
@@ -13,23 +34,8 @@ npm install
 ng serve
 
 ## API Base URL
-http://localhost:8080/api
+http://localhost:8080
 
-## Branch Strategy
-main
-|- feature/auth         <- Dev A
-|- feature/payee-list   <- Dev B
-|- feature/payee-crud   <- Dev C
-\- feature/search-smart <- Dev D
+## Docker Compose
 
-Each dev runs on their machine:
-git checkout -b feature/<their-feature>
-
-Push changes:
-git add .
-git commit -m "descriptive message"
-git push origin feature/<their-feature>
-
-Merge to main only when feature is complete and tested.
-Always git pull origin main before starting work each session.
-Never commit directly to main.
+docker-compose up --build

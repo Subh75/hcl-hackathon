@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "8081:8081"
+    environment:
+      - JWT_SECRET=favouritePayeeSecretKey2024
+
+  bank-scoring-service:
+    build: ./bank-scoring-service
+    ports:
+      - "8083:8083"
+    environment:
+      - PAYEE_SERVICE_URL=http://payee-service:8082
+
+  payee-service:
+    build: ./payee-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - auth-service
+      - bank-scoring-service
+    environment:
+      - JWT_SECRET=favouritePayeeSecretKey2024
+      - BANK_SERVICE_URL=http://bank-scoring-service:8083
+      - SCORING_SERVICE_URL=http://bank-scoring-service:8083
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-service
+      - payee-service
+      - bank-scoring-service
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:8081
+      - PAYEE_SERVICE_URL=http://payee-service:8082
+      - BANK_SCORING_SERVICE_URL=http://bank-scoring-service:8083
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - api-gateway

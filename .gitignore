@@ -1,4 +1,7 @@
-backend/target/
+auth-service/target/
+payee-service/target/
+bank-scoring-service/target/
+api-gateway/target/
 frontend/node_modules/
 frontend/dist/
 .env
