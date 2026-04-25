@@ -1,5 +1,6 @@
 package com.favouritepayee.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -33,16 +34,28 @@ public class JwtUtil {
 
     public Optional<Long> extractCustomerId(String token) {
         try {
-            String subject = Jwts.parser()
-                    .verifyWith(signingKey())
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload()
-                    .getSubject();
+            String subject = parseClaims(token).getSubject();
             return Optional.of(Long.valueOf(subject));
         } catch (JwtException | IllegalArgumentException exception) {
             return Optional.empty();
         }
+    }
+
+    public Optional<String> extractRole(String token) {
+        try {
+            String role = parseClaims(token).get("role", String.class);
+            return Optional.ofNullable(role);
+        } catch (JwtException | IllegalArgumentException exception) {
+            return Optional.empty();
+        }
+    }
+
+    private Claims parseClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(signingKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     private SecretKey signingKey() {

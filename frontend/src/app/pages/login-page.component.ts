@@ -1,18 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
     <div class="page-shell login-shell">
       <section class="panel login-panel">
         <h1 class="title">Favourite Payee</h1>
-        <p class="subtitle">Login with your customer id to manage trusted accounts.</p>
+        <p class="subtitle">Login with your credentials to manage trusted accounts.</p>
 
         <label for="customerId" class="field-label">Customer ID</label>
         <input
@@ -26,11 +26,28 @@ import { AuthService } from '../services/auth.service';
           Valid customer id is required.
         </div>
 
+        <label for="password" class="field-label">Password</label>
+        <input
+          id="password"
+          class="input"
+          type="password"
+          [formControl]="passwordControl"
+          placeholder="Enter password"
+          (keydown.enter)="login()"
+        />
+        <div class="error-text" *ngIf="passwordControl.invalid && passwordControl.touched">
+          Password is required.
+        </div>
+
         <div class="error-text" *ngIf="errorMessage">{{ errorMessage }}</div>
 
         <button class="btn btn-primary login-btn" (click)="login()" [disabled]="loading">
           {{ loading ? 'Signing in...' : 'Login' }}
         </button>
+
+        <p class="register-link">
+          Don't have an account? <a routerLink="/register">Register here</a>
+        </p>
       </section>
     </div>
   `,
@@ -61,6 +78,23 @@ import { AuthService } from '../services/auth.service';
       width: 100%;
     }
 
+    .register-link {
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .register-link a {
+      color: #1a73e8;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .register-link a:hover {
+      text-decoration: underline;
+    }
+
     @keyframes reveal {
       from {
         transform: translateY(12px);
@@ -75,6 +109,7 @@ import { AuthService } from '../services/auth.service';
 })
 export class LoginPageComponent {
   readonly customerIdControl = new FormControl<number | null>(null, [Validators.required, Validators.min(1)]);
+  readonly passwordControl = new FormControl<string>('', [Validators.required]);
 
   loading = false;
   errorMessage = '';
@@ -91,16 +126,20 @@ export class LoginPageComponent {
       this.customerIdControl.markAsTouched();
       return;
     }
+    if (this.passwordControl.invalid) {
+      this.passwordControl.markAsTouched();
+      return;
+    }
 
     this.loading = true;
-    this.authService.login(this.customerIdControl.value).subscribe({
+    this.authService.login(this.customerIdControl.value, this.passwordControl.value!).subscribe({
       next: () => {
         this.loading = false;
         void this.router.navigate(['/payees']);
       },
       error: (error: { error?: { message?: string; errors?: Record<string, string> } }) => {
         this.loading = false;
-        this.errorMessage = error.error?.errors?.['customerId'] || error.error?.message || 'Login failed';
+        this.errorMessage = error.error?.errors?.['password'] || error.error?.errors?.['customerId'] || error.error?.message || 'Login failed';
       }
     });
   }
