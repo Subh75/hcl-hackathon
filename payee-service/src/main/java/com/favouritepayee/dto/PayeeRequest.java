@@ -10,7 +10,7 @@ public record PayeeRequest(
         String name,
         @NotBlank(message = "iban is required")
         @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "iban must be alphanumeric")
-        @Size(max = 20, message = "iban must be at most 20 characters")
+        @Size(min = 20, max = 20, message = "iban must be exactly 20 characters")
         String iban
 ) {
 }

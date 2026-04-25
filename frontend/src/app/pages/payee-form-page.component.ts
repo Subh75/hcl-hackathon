@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormFieldComponent } from '../components/form-field.component';
 import { PayeeDto, PayeePayload } from '../models/payee.model';
@@ -30,11 +30,11 @@ import { PayeeService } from '../services/payee.service';
 
           <app-form-field
             id="iban"
-            label="IBAN"
+            label="IBAN/Account Number"
             [control]="ibanControl"
-            [maxLength]="20"
+            [maxLength]="24"
             [errorMessage]="ibanError()"
-            placeholder="Enter IBAN"
+            placeholder="ES50 2134 4954 4443 2222"
           ></app-form-field>
 
           <label class="field" for="bank">
@@ -115,6 +115,12 @@ import { PayeeService } from '../services/payee.service';
   `]
 })
 export class PayeeFormPageComponent implements OnInit {
+  static ibanLengthValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    const stripped = control.value.replace(/\s+/g, '');
+    return stripped.length === 20 ? null : { exactLength: true };
+  }
+
   readonly form = new FormGroup({
     name: new FormControl<string>('', {
       nonNullable: true,
@@ -122,7 +128,12 @@ export class PayeeFormPageComponent implements OnInit {
     }),
     iban: new FormControl<string>('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.pattern(/^[a-zA-Z0-9]+$/), Validators.maxLength(20)]
+      validators: [
+        Validators.required,
+        Validators.pattern(/^[a-zA-Z0-9\s]+$/),
+        Validators.maxLength(24),
+        PayeeFormPageComponent.ibanLengthValidator
+      ]
     }),
     bank: new FormControl<string>({ value: '', disabled: true }, {
       nonNullable: true,
@@ -202,7 +213,7 @@ export class PayeeFormPageComponent implements OnInit {
 
     const payload: PayeePayload = {
       name: this.nameControl.value.trim(),
-      iban: this.ibanControl.value.trim().toUpperCase()
+      iban: this.ibanControl.value.replace(/\s+/g, '').toUpperCase()
     };
 
     this.saving = true;
@@ -263,10 +274,13 @@ export class PayeeFormPageComponent implements OnInit {
       return 'IBAN is required';
     }
     if (this.ibanControl.hasError('pattern')) {
-      return 'IBAN must be alphanumeric';
+      return 'IBAN must be alphanumeric (spaces allowed)';
+    }
+    if (this.ibanControl.hasError('exactLength')) {
+      return 'IBAN must be exactly 20 characters (excluding spaces)';
     }
     if (this.ibanControl.hasError('maxlength')) {
-      return 'IBAN must be at most 20 characters';
+      return 'IBAN must be at most 24 characters including spaces';
     }
     return 'Invalid IBAN';
   }
@@ -287,7 +301,7 @@ export class PayeeFormPageComponent implements OnInit {
   }
 
   private setBankFromIban(iban: string): void {
-    const trimmed = iban.trim().toUpperCase();
+    const trimmed = iban.replace(/\s+/g, '').toUpperCase();
     if (trimmed.length < 8 || !/^[a-zA-Z0-9]+$/.test(trimmed)) {
       this.bankControl.setValue('', { emitEvent: false });
       return;
