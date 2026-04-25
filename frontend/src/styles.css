@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Manrope:wght@400;600;700&display=swap');
+
+:root {
+  --bg-main: radial-gradient(circle at 10% 0%, #dff5ec 0%, #f7fbf5 45%, #fdf2e2 100%);
+  --card-bg: rgba(255, 255, 255, 0.86);
+  --card-border: #d6e9dd;
+  --text-main: #1f2a22;
+  --text-soft: #5c6b60;
+  --accent: #0a8f56;
+  --accent-strong: #06673e;
+  --danger: #b13621;
+  --warning: #c28b08;
+  --shadow: 0 18px 45px rgba(24, 61, 44, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Manrope', sans-serif;
+  color: var(--text-main);
+  background: var(--bg-main);
+  background-attachment: fixed;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.page-shell {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 2.75rem;
+}
+
+.panel {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(8px);
+}
+
+.title {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--text-soft);
+}
+
+.btn {
+  border: 0;
+  border-radius: 12px;
+  padding: 0.65rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  color: white;
+  background: linear-gradient(125deg, var(--accent), var(--accent-strong));
+  box-shadow: 0 12px 25px rgba(10, 143, 86, 0.2);
+}
+
+.btn-secondary {
+  color: var(--text-main);
+  background: #eef6f0;
+}
+
+.btn-danger {
+  color: white;
+  background: linear-gradient(130deg, #d04830, var(--danger));
+}
+
+.input {
+  width: 100%;
+  border: 1px solid #c7dfcf;
+  border-radius: 12px;
+  padding: 0.75rem 0.85rem;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.input:focus {
+  outline: 2px solid rgba(10, 143, 86, 0.28);
+  border-color: var(--accent);
+}
+
+.error-text {
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--danger);
+}
+
+@media (max-width: 640px) {
+  .page-shell {
+    padding: 1rem 0.75rem 2rem;
+  }
+}
