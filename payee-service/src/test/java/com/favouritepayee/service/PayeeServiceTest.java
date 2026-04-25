@@ -52,8 +52,6 @@ public class PayeeServiceTest {
     @Test
     void testCreatePayee_Success() {
         when(payeeRepository.save(any(FavouriteAccount.class))).thenReturn(samplePayee);
-        // Mocking the bank resolver call if it's there
-        // Actually, the service might call Scoring Service. Let's assume it's mocked or not needed for this unit test if it's in the service.
         
         PayeeDto result = payeeService.createPayee(1L, sampleRequest);
         
@@ -64,7 +62,7 @@ public class PayeeServiceTest {
 
     @Test
     void testGetPayeeById_Success() {
-        when(payeeRepository.findByCustomerIdAndId(1L, 1L)).thenReturn(Optional.of(samplePayee));
+        when(payeeRepository.findByIdAndCustomerId(1L, 1L)).thenReturn(Optional.of(samplePayee));
         
         PayeeDto result = payeeService.getPayeeById(1L, 1L);
         
@@ -74,14 +72,14 @@ public class PayeeServiceTest {
 
     @Test
     void testGetPayeeById_NotFound() {
-        when(payeeRepository.findByCustomerIdAndId(1L, 99L)).thenReturn(Optional.empty());
+        when(payeeRepository.findByIdAndCustomerId(99L, 1L)).thenReturn(Optional.empty());
         
         assertThrows(BadRequestException.class, () -> payeeService.getPayeeById(1L, 99L));
     }
 
     @Test
     void testUpdatePayee_Success() {
-        when(payeeRepository.findByCustomerIdAndId(1L, 1L)).thenReturn(Optional.of(samplePayee));
+        when(payeeRepository.findByIdAndCustomerId(1L, 1L)).thenReturn(Optional.of(samplePayee));
         when(payeeRepository.save(any(FavouriteAccount.class))).thenReturn(samplePayee);
         
         PayeeRequest updateRequest = new PayeeRequest("Jane Doe", "WXYZ9876543210987654");
@@ -94,14 +92,14 @@ public class PayeeServiceTest {
 
     @Test
     void testUpdatePayee_NotFound() {
-        when(payeeRepository.findByCustomerIdAndId(1L, 1L)).thenReturn(Optional.empty());
+        when(payeeRepository.findByIdAndCustomerId(1L, 1L)).thenReturn(Optional.empty());
         
         assertThrows(BadRequestException.class, () -> payeeService.updatePayee(1L, 1L, sampleRequest));
     }
 
     @Test
     void testDeletePayee_Success() {
-        when(payeeRepository.findByCustomerIdAndId(1L, 1L)).thenReturn(Optional.of(samplePayee));
+        when(payeeRepository.findByIdAndCustomerId(1L, 1L)).thenReturn(Optional.of(samplePayee));
         doNothing().when(payeeRepository).delete(any());
         
         assertDoesNotThrow(() -> payeeService.deletePayee(1L, 1L));
@@ -110,14 +108,14 @@ public class PayeeServiceTest {
 
     @Test
     void testDeletePayee_NotFound() {
-        when(payeeRepository.findByCustomerIdAndId(1L, 1L)).thenReturn(Optional.empty());
+        when(payeeRepository.findByIdAndCustomerId(1L, 1L)).thenReturn(Optional.empty());
         
         assertThrows(BadRequestException.class, () -> payeeService.deletePayee(1L, 1L));
     }
 
     @Test
     void testMapToDto_InternalLogic() {
-        when(payeeRepository.findByCustomerIdAndId(1L, 1L)).thenReturn(Optional.of(samplePayee));
+        when(payeeRepository.findByIdAndCustomerId(1L, 1L)).thenReturn(Optional.of(samplePayee));
         
         PayeeDto result = payeeService.getPayeeById(1L, 1L);
         
